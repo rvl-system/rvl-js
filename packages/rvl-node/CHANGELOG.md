@@ -13,8 +13,11 @@ New:
 
 - Added `currentLimit` to `NodeConfiguration`, `NodeCapabilities` and `NodeStatus`. It is the continuous rating in mA of what feeds a board's strip, and the board scales its brightness down on any frame that would draw more. `configureNode` sets it, from 1 to `MAX_CURRENT_LIMIT`, and boards default to 1500
 - Added `MAX_CURRENT_LIMIT`, 65535, the largest value the current limit's 16-bit field on the wire holds
-- Added `MIN_FADE_FRAMES`, 16, the shortest fade a scene can ask for
 - Added `SCENE_LEAD_FRAMES`, 5, how far ahead of the current frame a scene with no start of its own begins
+
+Other changes:
+
+- The shortest `fadeFrames` is now 6, about 0.2 s, down from 16. Firmware from before the change raises a shorter fade back to 16
 
 ## 9.0.0 (2026-11-01)
 

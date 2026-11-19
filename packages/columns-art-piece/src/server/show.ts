@@ -1,8 +1,11 @@
-import { MIN_FADE_FRAMES, setAnimationParameters } from 'rvl-node';
+import { setAnimationParameters } from 'rvl-node';
 
 import { type Column, type Settings } from '../common/messages.ts';
 import { getColumns } from './columns.ts';
 import { buildColumnScene } from './scene.ts';
+
+// A control change's dissolve, half a second
+export const CHANGE_FADE_FRAMES = 16;
 
 let settings: Settings = {
   animation: 'shift',
@@ -51,6 +54,6 @@ export function sendColumnScene(
 // scene changed is sent
 export function showColumns(): void {
   for (const column of getColumns()) {
-    sendColumnScene(column, settings, false, MIN_FADE_FRAMES);
+    sendColumnScene(column, settings, false, CHANGE_FADE_FRAMES);
   }
 }

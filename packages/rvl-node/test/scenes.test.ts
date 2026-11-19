@@ -1,6 +1,6 @@
 import { beforeEach, expect, test } from 'vitest';
 
-import { DEFAULT_FADE_FRAMES } from '../src/config.ts';
+import { DEFAULT_FADE_FRAMES, MIN_FADE_FRAMES } from '../src/config.ts';
 import { type Node, startNode } from './harness.ts';
 import { type SentScene } from './packets.ts';
 
@@ -523,7 +523,7 @@ test('a step across the frame wrap keeps the fade', async () => {
 
 test('bad arguments throw at the call', () => {
   expect(() => node.animation.setOff(8)).toThrow(/Channel/);
-  for (const fadeFrames of [15, 256, 16.5]) {
+  for (const fadeFrames of [MIN_FADE_FRAMES - 1, 256, 16.5]) {
     expect(() => setScene(1, { fadeFrames })).toThrow(/fadeFrames/);
   }
   for (const startFrame of [-1, 2 ** 32, 1.5]) {

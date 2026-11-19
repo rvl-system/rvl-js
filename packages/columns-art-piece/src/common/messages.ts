@@ -54,8 +54,8 @@ export const NUMBER_RANGES: Record<
   // How far the pulse's color covers a column at the peak, as the layer's alpha
   pulseIntensity: { min: 0, max: 255 },
   // The fades in and out, in tenths of a second
-  pulseAttack: { min: 5, max: 80 },
-  pulseDecay: { min: 5, max: 80 },
+  pulseAttack: { min: 2, max: 80 },
+  pulseDecay: { min: 2, max: 80 },
   // In seconds: a pulse starts the minimum plus up to the spread after the
   // last one ended
   pulseMinDelay: { min: 0, max: 60 },

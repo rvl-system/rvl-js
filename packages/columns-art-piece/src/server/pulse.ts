@@ -1,13 +1,18 @@
-import { FRAME_PERIOD, MIN_FADE_FRAMES, SCENE_LEAD_FRAMES } from 'rvl-node';
+import { FRAME_PERIOD, SCENE_LEAD_FRAMES } from 'rvl-node';
 
 import { type Column, type Settings } from '../common/messages.ts';
 import { getColumns } from './columns.ts';
-import { getSettings, sendColumnScene, showColumns } from './show.ts';
+import {
+  CHANGE_FADE_FRAMES,
+  getSettings,
+  sendColumnScene,
+  showColumns,
+} from './show.ts';
 
 // The longest rvl-node takes to land a change, since it holds one request
 // behind one scene in flight. A pulse step sent sooner would be held as well
 const CHANGE_LANDING_TIME =
-  2 * (SCENE_LEAD_FRAMES + MIN_FADE_FRAMES) * FRAME_PERIOD;
+  2 * (SCENE_LEAD_FRAMES + CHANGE_FADE_FRAMES) * FRAME_PERIOD;
 
 const RECENT_PULSES_AVOIDED = 2;
 
