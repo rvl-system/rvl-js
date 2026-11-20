@@ -20,6 +20,7 @@ import { writeInfrastructureHeader } from './infrastructure.ts';
 const IDENTITY_LOOP_INTERVAL = 250;
 const ID_RETRY_INTERVAL = 1000;
 const ID_RETRY_JITTER = 250;
+const ID_REFRESH_INTERVAL = 10000;
 const ID_WARNING_INTERVAL = 10000;
 
 let deviceId: number | undefined;
@@ -28,7 +29,7 @@ let connected = false;
 let nextIdRequestTime = 0;
 let idRequested = false;
 let lastIdRequestTime = 0;
-let lastIdWarningTime = 0;
+let nextIdWarningTime = 0;
 
 export function getDeviceId(): number | undefined {
   assertInitialized();
@@ -53,7 +54,7 @@ function announceIfConnected(): void {
 export function startIdentityProtocol(): void {
   const now = performance.now();
   nextIdRequestTime = now;
-  lastIdWarningTime = now;
+  nextIdWarningTime = now + ID_WARNING_INTERVAL;
   void waitForClockSync().then(announceIfConnected);
   runIdentityLoop();
   setInterval(runIdentityLoop, IDENTITY_LOOP_INTERVAL);
@@ -68,7 +69,7 @@ function runIdentityLoop(): void {
   if (!interfaceAddress) {
     if (deviceId !== undefined) {
       deviceId = undefined;
-      lastIdWarningTime = now;
+      nextIdWarningTime = now + ID_WARNING_INTERVAL;
       if (connected) {
         connected = false;
         emit('disconnected');
@@ -76,7 +77,7 @@ function runIdentityLoop(): void {
     }
     nextIdRequestTime = now;
     idRequested = false;
-  } else if (deviceId === undefined && now >= nextIdRequestTime) {
+  } else if (now >= nextIdRequestTime) {
     if (!idRequested) {
       console.info('Requesting device ID');
       idRequested = true;
@@ -87,20 +88,23 @@ function runIdentityLoop(): void {
       now + ID_RETRY_INTERVAL + Math.random() * ID_RETRY_JITTER;
   }
 
-  if (
-    deviceId === undefined &&
-    now - lastIdWarningTime >= ID_WARNING_INTERVAL
-  ) {
-    lastIdWarningTime = now;
-    if (interfaceAddress) {
+  if (now >= nextIdWarningTime) {
+    nextIdWarningTime = now + ID_WARNING_INTERVAL;
+    if (!interfaceAddress) {
+      console.warn(
+        `Waiting for ${getNetworkInterface()} to get an IPv4 address. ` +
+          `Available interfaces: ${getAvailableInterfaces().join(', ')}`
+      );
+    } else if (deviceId === undefined) {
       console.warn(
         `No device ID from the coordinator yet. Is ${getNetworkInterface()} ` +
           `(${interfaceAddress.address}) on the fleet's network?`
       );
     } else {
       console.warn(
-        `Waiting for ${getNetworkInterface()} to get an IPv4 address. ` +
-          `Available interfaces: ${getAvailableInterfaces().join(', ')}`
+        `The coordinator has stopped answering device ID ${deviceId}. Is ` +
+          `${getNetworkInterface()} (${interfaceAddress.address}) still on ` +
+          `the fleet's network?`
       );
     }
   }
@@ -110,7 +114,7 @@ function sendIdRequest(): void {
   const packet = new AppendBuffer();
   writeInfrastructureHeader(
     packet,
-    UNASSIGNED_DEVICE_ID,
+    deviceId ?? UNASSIGNED_DEVICE_ID,
     RVLI_PACKET_TYPE_ID_ASSIGNMENT,
     EVERY_DEVICE_ID
   );
@@ -119,13 +123,21 @@ function sendIdRequest(): void {
 }
 
 export function handleIdReply(id: number): void {
+  const now = performance.now();
+  // Before the return for an unchanged ID, or every refresh would be retried
+  // each second
+  nextIdRequestTime = now + ID_REFRESH_INTERVAL;
+  nextIdWarningTime = nextIdRequestTime + ID_WARNING_INTERVAL;
   if (id === deviceId) {
     return;
   }
-  const roundTrip = performance.now() - lastIdRequestTime;
+  const roundTrip = now - lastIdRequestTime;
   console.info(
     `Assigned device ID ${id}, ${roundTrip.toFixed(1)} ms after the request`
   );
   deviceId = id;
+  if (connected) {
+    emit('deviceIdChanged');
+  }
   announceIfConnected();
 }

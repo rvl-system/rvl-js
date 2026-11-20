@@ -282,6 +282,12 @@ function driveStartedServer(
     await flush();
   }
 
+  async function changeDeviceId(deviceId: number): Promise<void> {
+    fake.deviceId = deviceId;
+    fake.emit('deviceIdChanged');
+    await flush();
+  }
+
   function fail(error: Error): void {
     fake.emit('error', error);
   }
@@ -305,6 +311,7 @@ function driveStartedServer(
     reject,
     join,
     leave,
+    changeDeviceId,
     fail,
     stop,
   };

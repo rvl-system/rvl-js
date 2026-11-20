@@ -146,6 +146,18 @@ test('leaving the fleet stops the listing and rejoining resumes it', async () =>
   expect(fleet.calls('getNodes')).toHaveLength(2);
 });
 
+test('a changed device ID tells every client and leaves the listing as it was', async () => {
+  const client = await connectListed();
+  await fleet.changeDeviceId(27);
+  expect(await client.next()).toEqual({
+    type: 'fleet',
+    fleet: { interface: 'en0', connected: true, deviceId: 27 },
+  });
+  expect(fleet.calls('getNodes')).toHaveLength(1);
+  await fleet.advance(5000);
+  expect(fleet.calls('getNodes')).toHaveLength(2);
+});
+
 test('an rvl-node error reaches onFleetError', () => {
   const error = new Error('Another RVL Node holds port 4979');
   fleet.fail(error);

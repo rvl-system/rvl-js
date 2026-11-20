@@ -59,6 +59,9 @@ export function startFleet({
     stopListing();
     notifyChange('fleet');
   });
+  on('deviceIdChanged', () => {
+    notifyChange('fleet');
+  });
   on('error', onError);
   init({ networkInterface });
 }

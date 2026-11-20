@@ -32,6 +32,11 @@ export function buildIdReply(deviceId: number, source = COORDINATOR): Buffer {
   return rvli(source, 1, [2, deviceId]);
 }
 
+// From a node that holds no ID yet unless a test says otherwise
+export function buildIdRequest(source = 255): Buffer {
+  return rvli(source, 1, [1]);
+}
+
 export function buildReference(
   id: number,
   startOfSet: boolean,
