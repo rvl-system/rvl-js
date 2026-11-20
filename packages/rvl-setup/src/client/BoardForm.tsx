@@ -23,9 +23,6 @@ function describeHonored(property: Property): string | undefined {
 // Why a board doesn't honor a property
 function describeMissing(property: Property): string {
   switch (property) {
-    case 'channel':
-    case 'brightness':
-      return 'Set on the board';
     case 'statusLedBrightness':
       return 'No status LED';
     default:
