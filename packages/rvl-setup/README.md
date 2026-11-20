@@ -31,11 +31,11 @@ A start without a built page exits with one line saying to run the build.
 
 ## The page
 
-The header shows whether the page is connected to the server and whether the server is on the fleet, with its device ID and interface. Below it, every board that has answered is a tile with its nickname, or _unnamed_, its device ID, and an Identify button, which flashes that board's strip and status LED white for five seconds so you can tell which one it is. The server asks the boards to report themselves every five seconds while a page is open. A board that misses a listing is marked as not answering, one that misses three is dropped, and either comes back when it answers again.
+The header shows whether the page is connected to the server and whether the server is on the fleet, with its device ID and interface. Below it, every board that has answered is a tile with its nickname, or _unnamed_, its device ID, and an Identify button, which flashes that board's strip and status LED for eight seconds so you can tell which one it is: white, red, green, then blue, and the same four again. The server asks the boards to report themselves every five seconds while a page is open. A board that misses a listing is marked as not answering, one that misses three is dropped, and either comes back when it answers again.
 
 Tapping a tile opens the board's settings, under its device ID, which save as they change, with no save button:
 
-- **Channel** and **Color order** are dropdowns and save on selection.
+- **Channel** and **Color order** are dropdowns and save on selection. To find a strip's order, set it to RGB and press Identify: the three colors after each white come in the order to pick.
 - **Brightness** and **Status LED brightness** are sliders. The board follows the slider as it moves, and the released value is the one it keeps.
 - **Pixel count**, **Current limit** and **Nickname** edit behind a pencil, in a dialog with Save and Cancel, since typing them would send a change per keystroke. The pixel count is 1 to 300, the size of the firmware's strip buffer. The current limit is the continuous rating, in mA, of what feeds the strip: its USB connector or cable, or its own supply. The board scales brightness down on any frame that would draw more, and a limit under about 1 mA per pixel leaves the strip black. Boards start at 1500. The nickname is up to 16 characters, and empty means none.
 

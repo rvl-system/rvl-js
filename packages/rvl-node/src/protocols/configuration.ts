@@ -237,8 +237,7 @@ export function configureNode<P extends keyof NodeConfiguration>(
   );
 }
 
-// Flashes a board white for five seconds, strip and status LED, and resolves
-// with its status
+// Flashes a board, strip and status LED, and resolves with its status
 export function identifyNode(deviceId: number): Promise<NodeStatus> {
   checkDeviceId(deviceId);
   return requestStatus(
